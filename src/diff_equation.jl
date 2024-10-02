@@ -1,4 +1,4 @@
-function euler_method(f::Function, grid::AbstractRange, start_value::T) where T <: Real
+function euler_method(f::Function, grid::AbstractRange, start_value::T) where T <: Union{Real, AbstractVector}
     solution = Vector{T}(undef, length(grid))
     h = step(grid)
     y = start_value
@@ -10,7 +10,7 @@ function euler_method(f::Function, grid::AbstractRange, start_value::T) where T 
     return solution
 end
 
-function rk2_method(f::Function, grid::AbstractRange, start_value::T; α=1) where T <: Real
+function rk2_method(f::Function, grid::AbstractRange, start_value::T; α=1) where T <: Union{Real, AbstractVector}
     solution = Vector{T}(undef, length(grid))
     h = step(grid)
     y = start_value
@@ -24,7 +24,7 @@ function rk2_method(f::Function, grid::AbstractRange, start_value::T; α=1) wher
     return solution
 end
 
-function rk4_method(f::Function, grid::AbstractRange, start_value::T) where T <: Real
+function rk4_method(f::Function, grid::AbstractRange, start_value::T) where T <: Union{Real, AbstractVector}
     solution = Vector{T}(undef, length(grid))
     h = step(grid)
     y = start_value
