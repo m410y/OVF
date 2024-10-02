@@ -11,5 +11,5 @@ start_value = [1.0, 1.0]
 solution = OVF.rk2_method((x, y) -> diff_eq_function(y), diff_eq_grid, start_value, α=1)
 
 using Plots
-plot(map(y -> y[1], solution), map(y -> y[2], solution))
+plot(solution[:, 1], solution[:, 2])
 png("plots/task_7_phase_trajectory.png")

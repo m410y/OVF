@@ -27,14 +27,12 @@ function dichotomy_root(f::Function, left::T, right::T; error=eps(T), verbose=fa
         else
             return retval(middle)
         end
-        if counter > max_iter
-            throw(OverflowError("too much iterations (> $(max_iter))"))
-        end
+        counter - 2 > max_iter && break
     end
     return retval((left + right) / 2)
 end
 
-function iteration_root(f::Function, start::T; error=eps(T), λ=1.0, verbose=false, max_iter=9999) where T <: Union{Number, AbstractArray}
+function iteration_root(f::Function, start::Union{T, AbstractArray{T}}; error=eps(1.0), verbose=false, λ=one(T), max_iter=9999) where T <: Number
     counter = 0
     f_wrap(x) = begin
         counter += 1
@@ -44,17 +42,15 @@ function iteration_root(f::Function, start::T; error=eps(T), λ=1.0, verbose=fal
     value = f_wrap(start)
     iszero(value) && return retval(start)
     old_x, x = start, start - λ * value
-    while abs(x - old_x) > error
+    while maximum(abs.(x - old_x)) > error
         value = f_wrap(x)
         old_x, x = x, x - λ * value
-        if counter > max_iter
-            throw(OverflowError("too much iterations (> $(max_iter))"))
-        end
+        counter - 1 > max_iter && break
     end
     return retval(x)
 end
 
-function newton_root(f::Function, J::Function, start::T; error=eps(T), verbose=false, max_iter=9999) where T <: Union{Number, AbstractArray}
+function newton_root(f::Function, J::Function, start::Union{T, AbstractArray{T}}; error=eps(T), verbose=false, max_iter=9999) where T <: Number
     counter = 0
     f_wrap(x) = begin
         counter += 1
@@ -64,17 +60,15 @@ function newton_root(f::Function, J::Function, start::T; error=eps(T), verbose=f
     value = f_wrap(start)
     iszero(value) && return retval(start)
     old_x, x = start, start - value
-    while abs(x - old_x) > error
+    while maximum(abs.(x - old_x)) > error
         value = f_wrap(x)
         old_x, x = x, x - value
-        if counter > max_iter
-            throw(OverflowError("too much iterations (> $(max_iter))"))
-        end
+        counter - 1 > max_iter && break
     end
     return retval(x)
 end
 
-function secant_root(f::Function, start::T; error=eps(T), verbose=false, λ=1.0, max_iter=9999) where T <: Union{Number, AbstractArray}
+function secant_root(f::Function, start::Union{T, AbstractArray{T}}; error=eps(T), verbose=false, λ=one(T), max_iter=9999) where T <: Number
     counter = 0
     f_wrap(x) = begin
         counter += 1
@@ -84,12 +78,10 @@ function secant_root(f::Function, start::T; error=eps(T), verbose=false, λ=1.0,
     value = f_wrap(start)
     iszero(value) && return retval(start)
     old_x, x = start, start - λ * value
-    while abs(x - old_x) > error
+    while maximum(abs.(x - old_x)) > error
         old_value, value = value, f_wrap(x)
         old_x, x = x, x - (x - old_x) / (value - old_value) * value
-        if counter > max_iter
-            throw(OverflowError("too much iterations (> $(max_iter))"))
-        end
+        counter - 1 > max_iter && break
     end
     return retval(x)
 end

@@ -10,7 +10,7 @@ end
 
 @testset "iteration root" begin
     @test iteration_root(x -> x, 1.0, λ=0.5) ≈ 0.0 atol=1e-15
-    @test_throws OverflowError iteration_root(x -> x, 1.0, λ=-0.01)
+    @test iteration_root(x -> x, 1.0, λ=-0.01, verbose=true)[2] > 1000
     @test iteration_root(x -> x^2 - 1.0, 2.0, λ=0.1) ≈ 1.0 atol=1e-4
 end
 
