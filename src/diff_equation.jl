@@ -119,3 +119,17 @@ function euler_implicit_method(f::Function, J::Function, grid::AbstractRange, st
     end
     return solution
 end
+
+function poisson_1D_bounded(f::Function, grid::AbstractRange, left_border::Tuple, right_border::Tuple)
+    A_left, B_left, C_left = left_border
+    A_right, B_right, C_right = right_border
+    h = step(grid)
+    one_line =  fill(1, length(grid) - 2)
+    solution = thomas_algorithm!(
+        [one_line/h^2; -B_right/h],
+        [A_left - B_left/h; -2one_line/h^2; A_right + B_right/h],
+        [B_left/h; one_line/h^2],
+        [C_left; f.(grid[begin+1:end-1]); C_right]
+    )
+    return solution
+end

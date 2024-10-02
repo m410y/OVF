@@ -41,3 +41,8 @@ end
     @test euler_implicit_method((x, y) -> cos(y), (x, y) -> -sin(y), 0:1e-2:1, 0.0)[end] ≈ 2atan(tanh(0.5)) atol=1e-2
     @test euler_implicit_method((x, y) -> [-y[2], y[1]], (x, y) -> [0 -1; 1 0], 0:1e-2:1, [1.0, 0.0])[end, :] ≈ [cos(1), sin(1)] atol=1e-2
 end
+
+@testset "poisson 1d bounded" begin
+    @test poisson_1D_bounded(zero, 0:1e-2:1, (1, 0, 0), (1, 0, 1)) ≈ 0:1e-2:1 atol=1e-14
+    @test poisson_1D_bounded(sin, 0:1e-2:1, (1, 0, 0), (1, 0, -sin(1))) ≈ -sin.(0:1e-2:1) atol=1e-2
+end
