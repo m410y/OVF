@@ -4,7 +4,8 @@ test_names = [
     "specials_test",
     "derivation_test",
     "inter_poly_test",
-    "diff_equation_test"
+    "diff_equation_test",
+    "linear_algebra_test"
 ]
 
 for test_name in test_names

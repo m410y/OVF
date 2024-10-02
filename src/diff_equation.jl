@@ -1,4 +1,5 @@
 include("root_find.jl")
+include("linear_algebra.jl")
 
 function euler_method(f::Function, grid::AbstractRange, start_value::T) where T <: Number
     solution = Vector{T}(undef, length(grid))
@@ -106,7 +107,7 @@ function euler_implicit_method(f::Function, J::Function, grid::AbstractRange, st
     h = step(grid)
     y = start_value
     solution[begin, :] = y
-    I = one(zeros(length(y), length(y)))
+    I = identity_matrix(length(y))
     for (step_n, x) in enumerate(grid[begin:end-1])
         y += newton_root(
             t -> t - (1 - α) * h * f(x, y) - α * h * f(x + h, y + t),
