@@ -42,7 +42,12 @@ end
     @test euler_implicit_method((x, y) -> [-y[2], y[1]], (x, y) -> [0 -1; 1 0], 0:1e-2:1, [1.0, 0.0])[end, :] ≈ [cos(1), sin(1)] atol=1e-2
 end
 
-@testset "poisson 1d bounded" begin
-    @test poisson_1D_bounded(zero, 0:1e-2:1, (1, 0, 0), (1, 0, 1)) ≈ 0:1e-2:1 atol=1e-14
-    @test poisson_1D_bounded(sin, 0:1e-2:1, (1, 0, 0), (1, 0, -sin(1))) ≈ -sin.(0:1e-2:1) atol=1e-2
+@testset "poisson 1D bounded" begin
+    @test poisson_1D(zero, 0:1e-2:1, (1, 0, 0), (1, 0, 1)) ≈ 0:1e-2:1 atol=1e-14
+    @test poisson_1D(sin, 0:1e-2:1, (1, 0, 0), (1, 0, -sin(1))) ≈ -sin.(0:1e-2:1) atol=1e-2
+end
+
+@testset "conductivity 1D bounded" begin
+    @test conductivity_1D((x, t) -> 0.0, 0:1e-1:1, 0:1e-1:1, (1, 0, 0), (1, 0, 0), zeros(11))[end, :] ≈ zeros(11) atol=1e-14
+    @test conductivity_1D((x, t) -> 0.0, 0:1e-2:1, 0:1e-2:0.1, (1, 0, 0), (1, 0, 0), sinpi.(0:1e-2:1))[end, :] ≈ exp.(-0.1*pi^2)*sinpi.(0:1e-2:1) atol=1e-2
 end

@@ -9,7 +9,7 @@ diff_eq_grid = range(
 A_left, B_left, C_left = left_borders = 1, -2, 1
 A_right, B_right, C_right = right_borders = 3, 1, -1
 
-solution = OVF.poisson_1D_bounded(cos, diff_eq_grid, left_borders, right_borders)
+solution = OVF.poisson_1D(cos, diff_eq_grid, left_borders, right_borders)
 
 using Plots
 a, b = [A_left  (B_left - pi/2*A_left);
