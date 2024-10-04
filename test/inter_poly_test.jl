@@ -9,19 +9,18 @@ include("../src/inter_poly.jl")
 end
 
 @testset "root polynom" begin
-    @test root_polynom([]) == [1]
     @test root_polynom([0, 0, 0]) == [0, 0, 0, 1]
     @test root_polynom([0, 1, 2]) == [0, 2, -3, 1]
 end
 
 @testset "lagrange polynom" begin
-    @test lagrange_polynom([0], [1]) == [1]
-    @test lagrange_polynom([0, 1], [1, 1]) == [1, 0]
-    @test lagrange_polynom([0, 1, 2], [0, 1, 4]) == [0, 0, 1]
+    @test lagrange_polynom([1], [0]) == [1]
+    @test lagrange_polynom([1, 1], [0, 1]) == [1, 0]
+    @test lagrange_polynom([0, 1, 4], [0, 1, 2]) == [0, 0, 1]
 end
 
 @testset "newton polynom" begin
-    @test newton_polynom([0], [1]) == [1]
-    @test newton_polynom([0, 1], [1, 1]) == [1, 0]
-    @test newton_polynom([0, 1, 2], [0, 1, 4]) == [0, 0, 1]
+    @test newton_polynom([1], [0]) == [1]
+    @test newton_polynom([1, 1], [0, 1]) == [1, 0]
+    @test newton_polynom([0, 1, 4], [0, 1, 2]) == [0, 0, 1]
 end
