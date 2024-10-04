@@ -1,87 +1,111 @@
-function dichotomy_root(f::Function, left::T, right::T; error=eps(T), verbose=false, max_iter=9999) where T <: Real
-    counter = 0
+function dichotomy_root(
+    f::Function,
+    left::T,
+    right::T;
+    error = eps(T),
+    show_iter = false,
+    iter_max = 9999,
+) where {T<:Real}
+    iter = 0
     f_wrap(x) = begin
-        counter += 1
+        iter += 1
         f(x)
     end
-    retval(val) = verbose ? (val, counter) : val
-    left_value = f_wrap(left)
-    iszero(left_value) && return retval(left)
-    right_value = f_wrap(right)
-    iszero(right_value) && return retval(right)
-    if sign(left_value) == sign(right_value)
+    retval(x) = show_iter ? (x, iter) : x
+    left_val = f_wrap(left)
+    iszero(left_val) && return retval(left)
+    right_val = f_wrap(right)
+    iszero(right_val) && return retval(right)
+    if sign(left_val) == sign(right_val)
         throw(ArgumentError("function xs at borders have same sign"))
     end
-    if left_value > right_value
+    if left_val > right_val
         left, right = right, left
     end
-    while abs(right - left) > error
+    while abs(right - left) > error && iter < iter_max
         middle = (left + right) / 2
-        middle_value = f_wrap(middle)
-        if middle_value < 0
+        middle_val = f_wrap(middle)
+        if middle_val < 0
             left = middle
-            left_value = middle_value
-        elseif  middle_value > 0
+            left_val = middle_val
+        elseif middle_val > 0
             right = middle
-            right_value = middle_value
+            right_val = middle_val
         else
             return retval(middle)
         end
-        counter - 2 > max_iter && break
     end
     return retval((left + right) / 2)
 end
 
-function iteration_root(f::Function, start::Union{T, AbstractArray{T}}; error=eps(1.0), verbose=false, λ=one(T), max_iter=9999) where T <: Number
-    counter = 0
+function iteration_root(
+    f::Function,
+    start::Union{T,AbstractArray{T}};
+    error = eps(T),
+    show_iter = false,
+    λ = 1,
+    iter_max = 9999,
+) where {T<:Number}
+    iter = 0
     f_wrap(x) = begin
-        counter += 1
+        iter += 1
         f(x)
     end
-    retval(x) = verbose ? (x, counter) : x
+    retval(x) = show_iter ? (x, iter) : x
     value = f_wrap(start)
     iszero(value) && return retval(start)
     old_x, x = start, start - λ * value
-    while maximum(abs.(x - old_x)) > error
+    while maximum(abs.(x - old_x)) > error && iter < iter_max
         value = f_wrap(x)
         old_x, x = x, x - λ * value
-        counter - 1 > max_iter && break
     end
     return retval(x)
 end
 
-function newton_root(f::Function, J::Function, start::Union{T, AbstractArray{T}}; error=eps(T), verbose=false, max_iter=9999) where T <: Number
-    counter = 0
+function newton_root(
+    f::Function,
+    J::Function,
+    start::Union{T,AbstractArray{T}};
+    error = eps(T),
+    show_iter = false,
+    iter_max = 9999,
+) where {T<:Number}
+    iter = 0
     f_wrap(x) = begin
-        counter += 1
+        iter += 1
         inv(J(x)) * f(x)
     end
-    retval(x) = verbose ? (x, counter) : x
+    retval(x) = show_iter ? (x, iter) : x
     value = f_wrap(start)
     iszero(value) && return retval(start)
     old_x, x = start, start - value
-    while maximum(abs.(x - old_x)) > error
+    while maximum(abs.(x - old_x)) > error && iter < iter_max
         value = f_wrap(x)
         old_x, x = x, x - value
-        counter - 1 > max_iter && break
     end
     return retval(x)
 end
 
-function secant_root(f::Function, start::Union{T, AbstractArray{T}}; error=eps(T), verbose=false, λ=one(T), max_iter=9999) where T <: Number
-    counter = 0
+function secant_root(
+    f::Function,
+    start::Union{T,AbstractArray{T}};
+    error = eps(T),
+    show_iter = false,
+    λ = 1,
+    iter_max = 9999,
+) where {T<:Number}
+    iter = 0
     f_wrap(x) = begin
-        counter += 1
+        iter += 1
         f(x)
     end
-    retval(x) = verbose ? (x, counter) : x
+    retval(x) = show_iter ? (x, iter) : x
     value = f_wrap(start)
     iszero(value) && return retval(start)
     old_x, x = start, start - λ * value
-    while maximum(abs.(x - old_x)) > error
+    while maximum(abs.(x - old_x)) > error && iter < iter_max
         old_value, value = value, f_wrap(x)
         old_x, x = x, x - (x - old_x) / (value - old_value) * value
-        counter - 1 > max_iter && break
     end
     return retval(x)
 end
