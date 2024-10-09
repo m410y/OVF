@@ -1,5 +1,6 @@
 include("../src/OVF.jl")
 using .OVF
+using Plots
 
 U_0 = 1.0
 a = 1.0

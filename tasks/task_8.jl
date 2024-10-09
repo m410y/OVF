@@ -1,5 +1,6 @@
 include("../src/OVF.jl")
 using .OVF
+using Plots
 
 diff_eq_grid = 0:2e-2:2
 A = [
@@ -28,7 +29,6 @@ solution_implicit = OVF.euler_implicit_method(
     α = 1,
 )
 
-using Plots
 plot(xlims = (-0.1, 2.1), ylims = (-1.1, 0.1))
 plot!(solution_true[:, 1], solution_true[:, 2])
 plot!(solution_explicit[:, 1], solution_explicit[:, 2], marker = :circ)

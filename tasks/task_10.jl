@@ -1,5 +1,6 @@
 include("../src/OVF.jl")
 using .OVF
+using Plots, Measures
 
 L = 1
 space_grid = range(start = 0, stop = L, length = 20)
@@ -18,7 +19,6 @@ solution = OVF.conductivity_1D(
     α = 1,
 )
 
-using Plots, Measures
 solution_true = exp.(-time_grid .* (pi / L)^2) * initial_values'
 heatmap(space_grid, time_grid, solution - solution_true, right_margin = 10.0mm)
 png("plots/task_10_solution_difference_heatmap.png")

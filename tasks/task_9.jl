@@ -1,5 +1,6 @@
 include("../src/OVF.jl")
 using .OVF
+using Plots
 
 diff_eq_grid = range(start = -pi / 2, stop = pi / 2, length = 10)
 A_left, B_left, C_left = left_borders = 1, -2, 1
@@ -7,7 +8,6 @@ A_right, B_right, C_right = right_borders = 3, 1, -1
 
 solution = OVF.poisson_1D(cos, diff_eq_grid, left_borders, right_borders)
 
-using Plots
 a, b =
     [
         A_left (B_left-pi/2*A_left)
