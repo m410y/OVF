@@ -1,156 +1,5 @@
-include("root_find.jl")
 include("linear_algebra.jl")
-
-function euler_method(f::Function, grid::AbstractRange, start_value::T) where {T<:Number}
-    solution = Vector{T}(undef, length(grid))
-    h = step(grid)
-    y = start_value
-    solution[begin] = y
-    for (step_n, x) in enumerate(grid[begin:end-1])
-        y += f(x, y) * h
-        solution[step_n+1] = y
-    end
-    return solution
-end
-
-function euler_method(
-    f::Function,
-    grid::AbstractRange,
-    start_value::AbstractVector{T},
-) where {T<:Number}
-    solution = Matrix{T}(undef, length(grid), length(start_value))
-    h = step(grid)
-    y = start_value
-    solution[begin, :] = y
-    for (step_n, x) in enumerate(grid[begin:end-1])
-        y += f(x, y) * h
-        solution[step_n+1, :] = y
-    end
-    return solution
-end
-
-function rk2_method(
-    f::Function,
-    grid::AbstractRange,
-    start_value::T;
-    α = 1,
-) where {T<:Number}
-    solution = Vector{T}(undef, length(grid))
-    h = step(grid)
-    y = start_value
-    solution[begin] = y
-    for (step_n, x) in enumerate(grid[begin:end-1])
-        k_1 = f(x, y)
-        k_2 = f(x + h / 2α, y + h / 2α * k_1)
-        y += ((1 - α) * k_1 + α * k_2) * h
-        solution[step_n+1] = y
-    end
-    return solution
-end
-
-function rk2_method(
-    f::Function,
-    grid::AbstractRange,
-    start_value::AbstractVector{T};
-    α = 1,
-) where {T<:Number}
-    solution = Matrix{T}(undef, length(grid), length(start_value))
-    h = step(grid)
-    y = start_value
-    solution[begin, :] = y
-    for (step_n, x) in enumerate(grid[begin:end-1])
-        k_1 = f(x, y)
-        k_2 = f(x + h / 2α, y + h / 2α * k_1)
-        y += ((1 - α) * k_1 + α * k_2) * h
-        solution[step_n+1, :] = y
-    end
-    return solution
-end
-
-function rk4_method(f::Function, grid::AbstractRange, start_value::T) where {T<:Number}
-    solution = Vector{T}(undef, length(grid))
-    h = step(grid)
-    y = start_value
-    solution[begin] = y
-    for (step_n, x) in enumerate(grid[begin:end-1])
-        k_1 = f(x, y)
-        k_2 = f(x + h / 2, y + h / 2 * k_1)
-        k_3 = f(x + h / 2, y + h / 2 * k_2)
-        k_4 = f(x + h, y + h * k_3)
-        y += (k_1 + 2k_2 + 2k_3 + k_4) * h / 6
-        solution[step_n+1] = y
-    end
-    return solution
-end
-
-function rk4_method(
-    f::Function,
-    grid::AbstractRange,
-    start_value::AbstractVector{T},
-) where {T<:Number}
-    solution = Matrix{T}(undef, length(grid), length(start_value))
-    h = step(grid)
-    y = start_value
-    solution[begin, :] = y
-    for (step_n, x) in enumerate(grid[begin:end-1])
-        k_1 = f(x, y)
-        k_2 = f(x + h / 2, y + h / 2 * k_1)
-        k_3 = f(x + h / 2, y + h / 2 * k_2)
-        k_4 = f(x + h, y + h * k_3)
-        y += (k_1 + 2k_2 + 2k_3 + k_4) * h / 6
-        solution[step_n+1, :] = y
-    end
-    return solution
-end
-
-function euler_implicit_method(
-    f::Function,
-    J::Function,
-    grid::AbstractRange,
-    start_value::T;
-    α = 1,
-    iterations = 1,
-) where {T<:Number}
-    solution = Vector{T}(undef, length(grid))
-    h = step(grid)
-    y = start_value
-    solution[begin] = y
-    for (step_n, x) in enumerate(grid[begin:end-1])
-        y += newton_root(
-            t -> t - (1 - α) * h * f(x, y) - α * h * f(x + h, y + t),
-            t -> 1 - α * h * J(x + h, y + t),
-            zero(T),
-            iter_max = iterations,
-        )
-        solution[step_n+1] = y
-    end
-    return solution
-end
-
-function euler_implicit_method(
-    f::Function,
-    J::Function,
-    grid::AbstractRange,
-    start_value::AbstractVector{T};
-    α = 1,
-    iterations = 1,
-) where {T<:Number}
-    solution = Matrix{T}(undef, length(grid), length(start_value))
-    h = step(grid)
-    y = start_value
-    solution[begin, :] = y
-    I = identity_matrix(length(y))
-    for (step_n, x) in enumerate(grid[begin:end-1])
-        y += newton_root(
-            t -> t - (1 - α) * h * f(x, y) - α * h * f(x + h, y + t),
-            t -> I - α * h * J(x + h, y + t),
-            zero(y),
-            iter_max = iterations,
-        )
-        solution[step_n+1, :] = y
-    end
-    return solution
-end
+include("integration.jl")
 
 function poisson_1D(
     f::Function,
@@ -211,23 +60,13 @@ function schrödinger_stationary_1D(
     grid::AbstractRange;
     E_0 = minimum(U.(grid)),
     Ψ_0 = exp.(E_0 .- U.(grid)),
-    error = eps(E_0),
-    iter_max = 9999,
 )
     N = length(grid)
     length(Ψ_0) == N || throw(ArgumentError("wrong Ψ and grid length"))
     h = step(grid)
-    U_vals = U.(grid)
-    Ψ = Ψ_0 / sqrt(trapezoid_integral(Ψ_0 .^ 2, h))
-    E_old, E = -Inf, E_0
     top = bot = fill(-1 / 2h^2, N - 1)
-    diag = fill(1 / h^2, N) .+ U_vals
-    iter = 0
-    while abs(E_old - E) > error && iter < iter_max
-        Ψ = thomas_algorithm(bot, diag, top, E * Ψ)
-        E_old, E = E, sqrt(trapezoid_integral(Ψ .^ 2, h))
-        Ψ /= E
-        iter += 1
-    end
-    return E, Ψ
+    diag = fill(1 / h^2, N) + U.(grid) .- E_0
+    E, Ψ = inverse_tridiag_method(bot, diag, top, start = Ψ_0)
+    Ψ /= sign(Ψ[end]) * sqrt(trapezoid_integral(Ψ .^ 2, h))
+    return E + E_0, Ψ
 end

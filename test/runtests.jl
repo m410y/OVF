@@ -5,6 +5,7 @@ test_names = [
     "derivation_test",
     "inter_poly_test",
     "linear_algebra_test",
+    "cauchy_problem_test",
     "diff_equation_test",
 ]
 
